@@ -17,6 +17,10 @@ void main() async {
   runApp(MaterialApp(
     home: MyApp(),
     debugShowCheckedModeBanner: false,
+    theme: ThemeData(
+      brightness: Brightness.dark,
+      primaryColor: Colors.lightBlue[800],
+    ),
   ));
 }
 
@@ -34,25 +38,26 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void initState() {
-
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: PageView(
-        controller: pageController,
-        children: [
-          Listagem(),
-          Favoritos(),
-          Adicionar(),
-        ],
-        onPageChanged: (value) {
-          controller.mudarCorBottomNavigation.sink.add(value);
-        },
+    return SafeArea(
+      child: Scaffold(
+        body: PageView(
+          controller: pageController,
+          children: [
+            Listagem(),
+            Favoritos(),
+            Adicionar(),
+          ],
+          onPageChanged: (value) {
+            controller.mudarCorBottomNavigation.sink.add(value);
+          },
+        ),
+        bottomNavigationBar: buildBottomNavigation(),
       ),
-      bottomNavigationBar: buildBottomNavigation(),
     );
   }
 
@@ -62,6 +67,7 @@ class _MyAppState extends State<MyApp> {
         stream: controller.mudarCorBottomNavigation.stream,
         builder: (context, snapshot) {
           return BottomNavigationBar(
+            backgroundColor: Colors.grey[800],
             onTap: (value) {
               pageController.animateToPage(value,
                   duration: Duration(microseconds: 400), curve: Curves.ease);

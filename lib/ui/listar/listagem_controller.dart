@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:projeto_lista_de_contatos/model/contato.dart';
 import 'package:projeto_lista_de_contatos/repository/contato_repository.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class ListagemController {
   //Instancia do banco de dados
@@ -18,10 +20,8 @@ class ListagemController {
 
   Future<void> excluirContato(Contato contato, BuildContext context) async {
     Contato desfazer = contato;
-
     repository.deleteContact(contato.id!);
     getContatos();
-
     ScaffoldMessenger.of(context).showSnackBar(
       buildSnackBar(desfazer),
     );

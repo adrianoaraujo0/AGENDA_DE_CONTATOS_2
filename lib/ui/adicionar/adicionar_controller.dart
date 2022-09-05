@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:projeto_lista_de_contatos/model/contato.dart';
 import 'package:projeto_lista_de_contatos/repository/contato_repository.dart';
+import 'package:rxdart/rxdart.dart';
 
 class AdicionarController {
   ContatoRepository repository = ContatoRepository();
@@ -9,18 +11,20 @@ class AdicionarController {
   final TextEditingController telefoneController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController imagemController = TextEditingController();
+  BehaviorSubject<bool> atualizarFoto = BehaviorSubject<bool>();
 
   Future<void> salvarContato(BuildContext context) async {
     repository.saveContact(Contato(
-      nome: nomeController.text,
-      telefone: telefoneController.text,
-      email: emailController.text,
-      imagem: imagemController.text,
-    ));
+        nome: nomeController.text,
+        telefone: telefoneController.text,
+        email: emailController.text,
+        imagem: imagemController.text));
+ 
 
     nomeController.clear();
     telefoneController.clear();
     emailController.clear();
+    imagemController.clear();
 
     ScaffoldMessenger.of(context).showSnackBar(
       buildSnackBar(),
@@ -33,4 +37,6 @@ class AdicionarController {
       backgroundColor: Colors.green,
     );
   }
+
+ 
 }

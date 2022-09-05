@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:projeto_lista_de_contatos/model/contato.dart';
 import 'package:projeto_lista_de_contatos/model/contato_model.dart';
 import 'package:projeto_lista_de_contatos/repository/contato_repository.dart';
@@ -13,7 +16,9 @@ class Adicionar extends StatelessWidget {
   Adicionar({Key? key}) : super(key: key);
 
   AdicionarController adicionarController = AdicionarController();
+  String? imagemPefil;
   final formKey = GlobalKey<FormState>();
+  var maskPhone = MaskTextInputFormatter(mask: "(##) #####-####");
 
   @override
   Widget build(BuildContext context) {
@@ -27,34 +32,42 @@ class Adicionar extends StatelessWidget {
           child: Column(
             // mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              GestureDetector(
-                child: Container(
-                  width: 140,
-                  height: 180,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    image: DecorationImage(
-                      image: const AssetImage(
-                        "images/person.png",
-                      ) as ImageProvider,
-                    ),
-                  ),
-                ),
-                onTap: () {
-                  ImagePicker.platform
-                      .pickImage(source: ImageSource.camera)
-                      .then(
-                    (file) {
-                      if (file == null) {
-                        return;
-                      }
-
-                      adicionarController.imagemController.text = file.path;
-                      print(file.path);
-                    },
-                  );
-                },
-              ),
+              StreamBuilder<bool>(
+                  stream: adicionarController.atualizarFoto.stream,
+                  builder: (context, snapshot) {
+                    return GestureDetector(
+                      child: Container(
+                        width: 140,
+                        height: 180,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          image: DecorationImage(
+                            image: imagemPefil != null
+                                ? FileImage(File(imagemPefil!))
+                                : AssetImage("images/person.png")
+                                    as ImageProvider,
+                          ),
+                        ),
+                      ),
+                      onTap: () {
+                        ImagePicker.platform
+                            .pickImage(source: ImageSource.camera)
+                            .then(
+                          (file) {
+                            if (file == null) {
+                              return;
+                            } else {
+                              adicionarController.imagemController.text =
+                                  file.path;
+                              imagemPefil = file.path;
+                              print(adicionarController.imagemController.text);
+                              adicionarController.atualizarFoto.sink.add(true);
+                            }
+                          },
+                        );
+                      },
+                    );
+                  }),
               Row(
                 children: [
                   Icon(Icons.person),
@@ -80,16 +93,22 @@ class Adicionar extends StatelessWidget {
                   Icon(Icons.phone),
                   SizedBox(width: 10),
                   Expanded(
-                      child: buildTextField(
-                          validador: (String? value) {
-                            if (value == null || value.isEmpty) {
-                              return "Telefone obrigatório";
-                            }
-                          },
-                          teclado: TextInputType.phone,
-                          controller: adicionarController.telefoneController,
-                          hintText: "ex: (85) 98995-5643",
-                          labelText: "Telefone do contato")),
+                    child: TextFormField(
+                      inputFormatters: [maskPhone],
+                      validator: (String? value) {
+                        if (value == null || value.isEmpty) {
+                          return "Telefone obrigatório";
+                        }
+                      },
+                      keyboardType: TextInputType.phone,
+                      controller: adicionarController.telefoneController,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        hintText: "ex: (85) 98995-5643",
+                        labelText: "Telefone do contato",
+                      ),
+                    ),
+                  ),
                 ],
               ),
               SizedBox(

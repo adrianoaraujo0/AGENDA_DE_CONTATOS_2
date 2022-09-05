@@ -60,6 +60,7 @@ class ContatoRepository {
   }
 
   Future<List<Contato>> getAllContacts() async {
+ 
     Database dbContact = await db;
     List listMap = await dbContact.rawQuery("SELECT * FROM $contatoTable");
     List<Contato> listContact = [];
