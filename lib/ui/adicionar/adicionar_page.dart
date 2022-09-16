@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -25,125 +26,121 @@ class Adicionar extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text("Adicionar contatos")),
       body: Center(
-          child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Form(
-          key: formKey,
-          child: Column(
-            // mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              StreamBuilder<bool>(
-                  stream: adicionarController.atualizarFoto.stream,
-                  builder: (context, snapshot) {
-                    return GestureDetector(
-                      child: Container(
-                        width: 140,
-                        height: 180,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          image: DecorationImage(
-                            image: imagemPefil != null
-                                ? FileImage(File(imagemPefil!))
-                                : AssetImage("images/person.png")
-                                    as ImageProvider,
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Form(
+            key: formKey,
+            child: Column(
+              // mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                StreamBuilder<bool>(
+                    stream: adicionarController.atualizarFoto.stream,
+                    builder: (context, snapshot) {
+                      return GestureDetector(
+                        child: Container(
+                          width: 140,
+                          height: 180,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            image: DecorationImage(
+                              image: imagemPefil != null
+                                  ? FileImage(File(imagemPefil!))
+                                  : AssetImage("images/person.png")
+                                      as ImageProvider,
+                            ),
                           ),
                         ),
-                      ),
-                      onTap: () {
-                        ImagePicker.platform
-                            .pickImage(source: ImageSource.camera)
-                            .then(
-                          (file) {
-                            if (file == null) {
-                              return;
-                            } else {
-                              adicionarController.imagemController.text =
-                                  file.path;
-                              imagemPefil = file.path;
-                              print(adicionarController.imagemController.text);
-                              adicionarController.atualizarFoto.sink.add(true);
-                            }
-                          },
-                        );
-                      },
-                    );
-                  }),
-              Row(
-                children: [
-                  Icon(Icons.person),
-                  SizedBox(width: 10),
-                  Expanded(
-                      child: buildTextField(
-                          validador: (String? value) {
-                            if (value == null || value.isEmpty) {
-                              return "Nome obrigatório";
-                            }
-                          },
-                          teclado: TextInputType.name,
-                          controller: adicionarController.nomeController,
-                          hintText: "ex: Jose Medeiros",
-                          labelText: "Nome do contato")),
-                ],
-              ),
-              SizedBox(
-                height: 15,
-              ),
-              Row(
-                children: [
-                  Icon(Icons.phone),
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: TextFormField(
-                      inputFormatters: [maskPhone],
-                      validator: (String? value) {
-                        if (value == null || value.isEmpty) {
-                          return "Telefone obrigatório";
-                        }
-                      },
-                      keyboardType: TextInputType.phone,
-                      controller: adicionarController.telefoneController,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(),
-                        hintText: "ex: (85) 98995-5643",
-                        labelText: "Telefone do contato",
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 15,
-              ),
-              Row(
-                children: [
-                  Icon(Icons.email),
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: TextFormField(
-                      controller: adicionarController.emailController,
-                      decoration: InputDecoration(
+                        onTap: () {
+                          ImagePicker.platform
+                              .pickImage(source: ImageSource.camera)
+                              .then(
+                            (file) {
+                              if (file == null) {
+                                return;
+                              } else {
+                                adicionarController.imagemController.text =
+                                    file.path;
+                                imagemPefil = file.path;
+                                print(
+                                    adicionarController.imagemController.text);
+                                adicionarController.atualizarFoto.sink
+                                    .add(true);
+                              }
+                            },
+                          );
+                        },
+                      );
+                    }),
+                Row(
+                  children: [
+                    Icon(Icons.person),
+                    SizedBox(width: 10),
+                    Expanded(
+                        child: buildTextField(
+                            validador: (String? value) {
+                              if (value == null || value.isEmpty) {
+                                return "Nome obrigatório";
+                              }
+                            },
+                            teclado: TextInputType.name,
+                            controller: adicionarController.nomeController,
+                            hintText: "ex: Jose Medeiros",
+                            labelText: "Nome do contato")),
+                  ],
+                ),
+                SizedBox(
+                  height: 15,
+                ),
+                Row(
+                  children: [
+                    Icon(Icons.phone),
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: TextFormField(
+                        inputFormatters: [maskPhone],
+                        validator: (String? value) {
+                          if (value == null || value.isEmpty) {
+                            return "Telefone obrigatório";
+                          }
+                        },
+                        keyboardType: TextInputType.phone,
+                        controller: adicionarController.telefoneController,
+                        decoration: InputDecoration(
                           border: OutlineInputBorder(),
-                          hintText: "ex: jose@yahoo.com.br",
-                          labelText: "Email do contato"),
-                      keyboardType: TextInputType.emailAddress,
+                          hintText: "ex: (85) 98995-5643",
+                          labelText: "Telefone do contato",
+                        ),
+                      ),
                     ),
-                  )
-                ],
-              ),
-            ],
+                  ],
+                ),
+                SizedBox(
+                  height: 15,
+                ),
+                Row(
+                  children: [
+                    Icon(Icons.email),
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: TextFormField(
+                        controller: adicionarController.emailController,
+                        decoration: InputDecoration(
+                            border: OutlineInputBorder(),
+                            hintText: "ex: jose@yahoo.com.br",
+                            labelText: "Email do contato"),
+                        keyboardType: TextInputType.emailAddress,
+                      ),
+                    )
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
-      )),
+      ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.save),
-        onPressed: (() {
-          print(formKey.currentState?.validate());
-          if (formKey.currentState?.validate() == false) {
-            formKey.currentState?.validate();
-          } else {
-            adicionarController.salvarContato(context);
-          }
-        }),
+        onPressed: () => adicionarController.salvarContato(context, formKey),
       ),
     );
   }

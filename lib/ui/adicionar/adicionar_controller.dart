@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:projeto_lista_de_contatos/model/contato.dart';
@@ -13,21 +14,40 @@ class AdicionarController {
   final TextEditingController imagemController = TextEditingController();
   BehaviorSubject<bool> atualizarFoto = BehaviorSubject<bool>();
 
-  Future<void> salvarContato(BuildContext context) async {
-    repository.saveContact(Contato(
-        nome: nomeController.text,
-        telefone: telefoneController.text,
-        email: emailController.text,
-        imagem: imagemController.text));
- 
+  Future<void> salvarContato(
+    BuildContext context,
+    GlobalKey<FormState> formKey,
+  ) async {
+    if (formKey.currentState?.validate() == false) {
+      formKey.currentState?.validate();
+    } else {
+      ///SQLFLITE
+      repository.saveContact(Contato(
+          nome: nomeController.text,
+          telefone: telefoneController.text,
+          email: emailController.text,
+          imagem: imagemController.text));
+      adicionarContatoFirebase();
+      nomeController.clear();
+      telefoneController.clear();
+      emailController.clear();
+      imagemController.clear();
 
-    nomeController.clear();
-    telefoneController.clear();
-    emailController.clear();
-    imagemController.clear();
+      ScaffoldMessenger.of(context).showSnackBar(
+        buildSnackBar(),
+      );
+      //FIREBASE
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      buildSnackBar(),
+    }
+  }
+
+  void adicionarContatoFirebase() {
+    FirebaseFirestore.instance.collection("Contatos").add(
+      {
+        "Nome": nomeController.text,
+        "Telefone": telefoneController.text,
+        "Email": emailController.text
+      },
     );
   }
 
@@ -37,6 +57,4 @@ class AdicionarController {
       backgroundColor: Colors.green,
     );
   }
-
- 
 }

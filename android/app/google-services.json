@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "441824603597",
+    "project_id": "agenda-de-contatos-96975",
+    "storage_bucket": "agenda-de-contatos-96975.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:441824603597:android:72dd56eb606826eaffa884",
+        "android_client_info": {
+          "package_name": "com.example.projeto_lista_de_contatos"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "441824603597-lp5kg42h6mcvp29eadaqs6mr600k35v9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.projeto_lista_de_contatos",
+            "certificate_hash": "5f4e5f4e2f4e9df9184480b1335bee09eccf964c"
+          }
+        },
+        {
+          "client_id": "441824603597-16uqrata9af01jmdsp3l2osppvipbst5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDIIqG_AjaIlH8_7lzusC6I2xNL5fFl6zs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "441824603597-16uqrata9af01jmdsp3l2osppvipbst5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
