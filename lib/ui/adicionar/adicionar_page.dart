@@ -34,43 +34,42 @@ class Adicionar extends StatelessWidget {
               // mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 StreamBuilder<bool>(
-                    stream: adicionarController.atualizarFoto.stream,
-                    builder: (context, snapshot) {
-                      return GestureDetector(
-                        child: Container(
-                          width: 140,
-                          height: 180,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            image: DecorationImage(
-                              image: imagemPefil != null
-                                  ? FileImage(File(imagemPefil!))
-                                  : AssetImage("images/person.png")
-                                      as ImageProvider,
-                            ),
+                  stream: adicionarController.atualizarFoto.stream,
+                  builder: (context, snapshot) {
+                    return GestureDetector(
+                      child: Container(
+                        width: 140,
+                        height: 180,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          image: DecorationImage(
+                            image: imagemPefil != null
+                                ? FileImage(File(imagemPefil!))
+                                : AssetImage("images/person.png")
+                                    as ImageProvider,
                           ),
                         ),
-                        onTap: () {
-                          ImagePicker.platform
-                              .pickImage(source: ImageSource.camera)
-                              .then(
-                            (file) {
-                              if (file == null) {
-                                return;
-                              } else {
-                                adicionarController.imagemController.text =
-                                    file.path;
-                                imagemPefil = file.path;
-                                print(
-                                    adicionarController.imagemController.text);
-                                adicionarController.atualizarFoto.sink
-                                    .add(true);
-                              }
-                            },
-                          );
-                        },
-                      );
-                    }),
+                      ),
+                      onTap: () {
+                        ImagePicker.platform
+                            .pickImage(source: ImageSource.camera)
+                            .then(
+                          (file) {
+                            if (file == null) {
+                              return;
+                            } else {
+                              adicionarController.imagemController.text =
+                                  file.path;
+                              imagemPefil = file.path;
+                              print(adicionarController.imagemController.text);
+                              adicionarController.atualizarFoto.sink.add(true);
+                            }
+                          },
+                        );
+                      },
+                    );
+                  },
+                ),
                 Row(
                   children: [
                     Icon(Icons.person),

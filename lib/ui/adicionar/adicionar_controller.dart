@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:projeto_lista_de_contatos/model/contato.dart';
@@ -22,11 +25,14 @@ class AdicionarController {
       formKey.currentState?.validate();
     } else {
       ///SQLFLITE
-      repository.saveContact(Contato(
+      repository.saveContact(
+        Contato(
           nome: nomeController.text,
           telefone: telefoneController.text,
           email: emailController.text,
-          imagem: imagemController.text));
+          imagem: imagemController.text,
+        ),
+      );
       adicionarContatoFirebase();
       nomeController.clear();
       telefoneController.clear();
@@ -41,14 +47,28 @@ class AdicionarController {
     }
   }
 
-  void adicionarContatoFirebase() {
-    FirebaseFirestore.instance.collection("Contatos").add(
-      {
-        "Nome": nomeController.text,
-        "Telefone": telefoneController.text,
-        "Email": emailController.text
-      },
-    );
+  void adicionarContatoFirebase() async {
+    if (imagemController.text != null) {
+      //uploadtask: Uma classe que indica uma tarefa de upload em andamento.
+      UploadTask task = FirebaseStorage.instance
+          .ref()
+          .child(DateTime.now().millisecondsSinceEpoch.toString())
+          .putFile(File(imagemController.text));
+
+      //Um [TaskSnapshot] é retornado como resultado ou processo em andamento de um [Task].
+      TaskSnapshot taskSnapshot = await task;
+      String url = await taskSnapshot.ref.getDownloadURL();
+      print("url = $url");
+
+      FirebaseFirestore.instance.collection("Contatos").add(
+        {
+          "Nome": nomeController.text,
+          "Telefone": telefoneController.text,
+          "Email": emailController.text,
+          "Image": imagemController.text
+        },
+      );
+    }
   }
 
   SnackBar buildSnackBar() {
