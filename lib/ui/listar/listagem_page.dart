@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -40,68 +41,76 @@ class _ListagemState extends State<Listagem> {
   }
 
   Widget buildStreamBuilder() {
-    return StreamBuilder<List<Contato>>(
-      stream: listagemController.controller.stream,
+    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+      stream: FirebaseFirestore.instance.collection("Contatos").snapshots(),
       builder: (context, snapshot) {
-        if (snapshot.data == null) {
-          return Text("Dados Nulos");
-        }
-        if (snapshot.data!.isEmpty) {
-          return Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasData &&
-            snapshot.connectionState == ConnectionState.active) {
-          return ListView.builder(
-            itemCount: snapshot.data!.length,
-            itemBuilder: (context, index) {
-              return Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: InkWell(
-                  onTap: () async {
-                    print("Contato = ${snapshot.data![index]}");
-                    await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => EditarContato(
-                          contato: snapshot.data![index],
-                        ),
-                      ),
-                    );
+        switch (snapshot.connectionState) {
+          case ConnectionState.none:
+          case ConnectionState.waiting:
+            return Center(
+              child: CircularProgressIndicator(),
+            );
 
-                    listagemController.getContatos();
-                    favoritosController.getFavoritos();
-                  },
-                  child: Slidable(
-                    endActionPane: ActionPane(
-                      motion: const StretchMotion(),
-                      children: [
-                        SlidableAction(
-                          onPressed: (context) {
-                            listagemController.excluirContato(
-                                snapshot.data![index], context);
-                          },
-                          label: "Deseja remover \nesse contato?",
-                          backgroundColor: Colors.red,
+          default:
+            List<DocumentSnapshot<Map<String, dynamic>>> documentos =
+                snapshot.data!.docs;
+
+            return ListView.builder(
+              itemCount: documentos.length,
+              itemBuilder: (context, index) {
+                Map<String, dynamic>? data = documentos[index].data();
+                print(data);
+                print("Email: ${data!["Email"]}");
+                print(data["Telefone"]);
+                print(data["Nome"]);
+                print(data["Image"]);
+
+                return Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: InkWell(
+                    onTap: () async {
+                      await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => EditarContato(
+                            contato: data[index],
+                          ),
                         ),
-                      ],
-                    ),
-                    child: buildCard(snapshot: snapshot, index: index),
+                      );
+
+                      listagemController.getContatos();
+                      favoritosController.getFavoritos();
+                    },
+                    child: Slidable(
+                        endActionPane: ActionPane(
+                          motion: const StretchMotion(),
+                          children: [
+                            SlidableAction(
+                              onPressed: (context) {
+                                listagemController.excluirContato(
+                                    data[index], context);
+                              },
+                              label: "Deseja remover \nesse contato?",
+                              backgroundColor: Colors.red,
+                            ),
+                          ],
+                        ),
+                        child: buildCard2(data: data, index: index)),
                   ),
-                ),
-              );
-            },
-          );
-        } else {
-          return Text("data");
+                );
+              },
+            );
         }
       },
     );
   }
 
-  Container buildCard({required AsyncSnapshot snapshot, required int index}) {
-    String? nome = snapshot.data[index].nome;
-    String? telefone = snapshot.data[index].telefone;
-    String? email = snapshot.data[index].email;
-    String? imagem = snapshot.data[index].imagem;
+  Container buildCard2(
+      {required Map<String, dynamic> data, required int index}) {
+    String? email = data["Email"];
+    String? telefone = data["Telefone"];
+    String? nome = data["Nome"];
+    String? imagem = data["Image"];
 
     return Container(
       color: Colors.grey[800],
