@@ -59,11 +59,8 @@ class _ListagemState extends State<Listagem> {
               itemCount: documentos.length,
               itemBuilder: (context, index) {
                 Map<String, dynamic>? data = documentos[index].data();
-                print(data);
-                print("Email: ${data!["Email"]}");
-                print(data["Telefone"]);
-                print(data["Nome"]);
-                print(data["Image"]);
+                // print(data);
+                // print(data.runtimeType);
 
                 return Padding(
                   padding: const EdgeInsets.all(10.0),
@@ -73,29 +70,34 @@ class _ListagemState extends State<Listagem> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => EditarContato(
-                            contato: data[index],
+                            contato: data![index],
                           ),
                         ),
                       );
-
-                      listagemController.getContatos();
-                      favoritosController.getFavoritos();
                     },
                     child: Slidable(
                         endActionPane: ActionPane(
                           motion: const StretchMotion(),
                           children: [
                             SlidableAction(
-                              onPressed: (context) {
-                                listagemController.excluirContato(
-                                    data[index], context);
+                              onPressed: (context) async {
+                                QuerySnapshot snapshot = await FirebaseFirestore
+                                    .instance
+                                    .collection("Contatos")
+                                    .get();
+
+                                snapshot.docs.forEach((element) {
+                                  print(element.get("Nome"));
+
+                                  // print(element.id);
+                                });
                               },
                               label: "Deseja remover \nesse contato?",
                               backgroundColor: Colors.red,
                             ),
                           ],
                         ),
-                        child: buildCard2(data: data, index: index)),
+                        child: buildCard(data: data!, index: index)),
                   ),
                 );
               },
@@ -105,7 +107,7 @@ class _ListagemState extends State<Listagem> {
     );
   }
 
-  Container buildCard2(
+  Container buildCard(
       {required Map<String, dynamic> data, required int index}) {
     String? email = data["Email"];
     String? telefone = data["Telefone"];
@@ -129,7 +131,9 @@ class _ListagemState extends State<Listagem> {
                       shape: BoxShape.circle,
                       image: DecorationImage(
                         image: imagem != null && imagem.isNotEmpty
-                            ? FileImage(File(imagem))
+                            ? FileImage(
+                                File(imagem),
+                              )
                             : AssetImage("images/person.png") as ImageProvider,
                       )),
                 ),

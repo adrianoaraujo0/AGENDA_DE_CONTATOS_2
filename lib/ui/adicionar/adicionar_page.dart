@@ -24,7 +24,9 @@ class Adicionar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Adicionar contatos")),
+      appBar: AppBar(
+        title: const Text("Adicionar contatos"),
+      ),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
@@ -75,19 +77,24 @@ class Adicionar extends StatelessWidget {
                 ),
                 Row(
                   children: [
-                    Icon(Icons.person),
-                    SizedBox(width: 10),
+                    const Icon(Icons.person),
+                    const SizedBox(width: 10),
                     Expanded(
-                        child: buildTextField(
-                            validador: (String? value) {
-                              if (value == null || value.isEmpty) {
-                                return "Nome obrigatório";
-                              }
-                            },
-                            teclado: TextInputType.name,
-                            controller: adicionarController.nomeController,
-                            hintText: "ex: Jose Medeiros",
-                            labelText: "Nome do contato")),
+                      child: TextFormField(
+                        validator: (String? value) {
+                          if (value == null || value.isEmpty) {
+                            return "Nome obrigatório";
+                          }
+                        },
+                        controller: adicionarController.nomeController,
+                        keyboardType: TextInputType.name,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          hintText: "ex: Jose Medeiros",
+                          labelText: "Nome do contato",
+                        ),
+                      ),
+                    ),
                   ],
                 ),
                 SizedBox(
@@ -127,7 +134,7 @@ class Adicionar extends StatelessWidget {
                       child: TextFormField(
                         controller: adicionarController.emailController,
                         decoration: InputDecoration(
-                            border: OutlineInputBorder(),
+                            border: const OutlineInputBorder(),
                             hintText: "ex: jose@yahoo.com.br",
                             labelText: "Email do contato"),
                         keyboardType: TextInputType.emailAddress,
@@ -145,22 +152,5 @@ class Adicionar extends StatelessWidget {
         onPressed: () => adicionarController.salvarContato(context, formKey),
       ),
     );
-  }
-
-  TextFormField buildTextField({
-    required TextEditingController controller,
-    required String hintText,
-    required String labelText,
-    required TextInputType teclado,
-    required validador,
-  }) {
-    return TextFormField(
-        validator: validador,
-        controller: controller,
-        decoration: InputDecoration(
-            border: OutlineInputBorder(),
-            hintText: hintText,
-            labelText: labelText),
-        keyboardType: teclado);
   }
 }

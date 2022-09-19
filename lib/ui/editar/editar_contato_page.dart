@@ -50,10 +50,7 @@ class _EditarContatoState extends State<EditarContato> {
                 IconButton(
                   onPressed: () {
                     launchUrlString(
-                        'tel:${editarController.telefoneController.text}'); 
-
-                      
-                  
+                        'tel:${editarController.telefoneController.text}');
                   },
                   icon: Icon(
                     Icons.phone,

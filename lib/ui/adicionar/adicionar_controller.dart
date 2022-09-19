@@ -8,31 +8,19 @@ import 'package:projeto_lista_de_contatos/repository/contato_repository.dart';
 import 'package:rxdart/rxdart.dart';
 
 class AdicionarController {
-  ContatoRepository repository = ContatoRepository();
-
   final TextEditingController nomeController = TextEditingController();
   final TextEditingController telefoneController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController imagemController = TextEditingController();
   BehaviorSubject<bool> atualizarFotoPerfil = BehaviorSubject<bool>();
 
-  Future<void> salvarContato(
+  salvarContato(
     BuildContext context,
     GlobalKey<FormState> formKey,
   ) async {
     if (formKey.currentState?.validate() == false) {
       formKey.currentState?.validate();
     } else {
-      ///SQLFLITE
-      repository.saveContact(
-        Contato(
-          nome: nomeController.text,
-          telefone: telefoneController.text,
-          email: emailController.text,
-          imagem: imagemController.text,
-        ),
-      );
-
       await adicionarContatoFirebase();
 
       nomeController.clear();
@@ -56,30 +44,42 @@ class AdicionarController {
   }
 
   Future<void> adicionarContatoFirebase() async {
-    if (imagemController.text != null) {
-      //uploadtask: Uma classe que indica uma tarefa de upload em andamento.
+    //validacao da imagem de perfil
+    if (imagemController.text != null && imagemController.text.isNotEmpty) {
       UploadTask task = FirebaseStorage.instance
           .ref()
           .child(DateTime.now().millisecondsSinceEpoch.toString())
           .putFile(File(imagemController.text));
 
-      //Um [TaskSnapshot] é retornado como resultado ou processo em andamento de um [Task].
       TaskSnapshot taskSnapshot = await task;
       String url = await taskSnapshot.ref.getDownloadURL();
     }
 
-    FirebaseFirestore.instance.collection("Contatos").add(
-      {
-        "Nome": nomeController.text,
-        "Telefone": telefoneController.text,
-        "Email": emailController.text,
-        "Image": imagemController.text
-      },
-    );
+    if (imagemController.text.isNotEmpty) {
+      FirebaseFirestore.instance.collection("Contatos").add(
+        {
+          "Nome": nomeController.text,
+          "Telefone": telefoneController.text,
+          "Email": emailController.text,
+          "Image": imagemController.text,
+          "Favoritos": false
+        },
+      );
+    } else {
+      FirebaseFirestore.instance.collection("Contatos").add(
+        {
+          "Nome": nomeController.text,
+          "Telefone": telefoneController.text,
+          "Email": emailController.text,
+          "Image": "",
+          "Favoritos": false
+        },
+      );
+    }
   }
 
   SnackBar buildSnackBar() {
-    return SnackBar(
+    return const SnackBar(
       content: Text("Contato salvo com sucesso!"),
       backgroundColor: Colors.green,
     );
