@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:projeto_lista_de_contatos/model/contato.dart';
 import 'package:projeto_lista_de_contatos/repository/contato_repository.dart';
 import 'package:rxdart/rxdart.dart';
@@ -15,7 +14,7 @@ class AdicionarController {
   final TextEditingController telefoneController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController imagemController = TextEditingController();
-  BehaviorSubject<bool> atualizarFoto = BehaviorSubject<bool>();
+  BehaviorSubject<bool> atualizarFotoPerfil = BehaviorSubject<bool>();
 
   Future<void> salvarContato(
     BuildContext context,
@@ -33,11 +32,15 @@ class AdicionarController {
           imagem: imagemController.text,
         ),
       );
-      adicionarContatoFirebase();
+
+      await adicionarContatoFirebase();
+
       nomeController.clear();
       telefoneController.clear();
       emailController.clear();
       imagemController.clear();
+
+      atualizarFotoPerfil.sink.add(true);
 
       ScaffoldMessenger.of(context).showSnackBar(
         buildSnackBar(),
@@ -47,7 +50,12 @@ class AdicionarController {
     }
   }
 
-  void adicionarContatoFirebase() async {
+  atualizarFotoAposAdicionarOuRemoverFoto(String path) {
+    imagemController.text = path;
+    atualizarFotoPerfil.sink.add(true);
+  }
+
+  Future<void> adicionarContatoFirebase() async {
     if (imagemController.text != null) {
       //uploadtask: Uma classe que indica uma tarefa de upload em andamento.
       UploadTask task = FirebaseStorage.instance
@@ -58,17 +66,16 @@ class AdicionarController {
       //Um [TaskSnapshot] é retornado como resultado ou processo em andamento de um [Task].
       TaskSnapshot taskSnapshot = await task;
       String url = await taskSnapshot.ref.getDownloadURL();
-      print("url = $url");
-
-      FirebaseFirestore.instance.collection("Contatos").add(
-        {
-          "Nome": nomeController.text,
-          "Telefone": telefoneController.text,
-          "Email": emailController.text,
-          "Image": imagemController.text
-        },
-      );
     }
+
+    FirebaseFirestore.instance.collection("Contatos").add(
+      {
+        "Nome": nomeController.text,
+        "Telefone": telefoneController.text,
+        "Email": emailController.text,
+        "Image": imagemController.text
+      },
+    );
   }
 
   SnackBar buildSnackBar() {

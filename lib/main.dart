@@ -1,14 +1,8 @@
-import 'dart:collection';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:projeto_lista_de_contatos/model/contato.dart';
-import 'package:projeto_lista_de_contatos/repository/contato_firebase.dart';
 import 'package:projeto_lista_de_contatos/repository/contato_repository.dart';
 import 'package:projeto_lista_de_contatos/ui/controller.dart';
 import 'package:projeto_lista_de_contatos/ui/listar/listagem_controller.dart';
 import 'package:projeto_lista_de_contatos/ui/listar/listagem_page.dart';
-import 'package:projeto_lista_de_contatos/ui/listar/listagem_page_setstate.dart';
 import 'package:projeto_lista_de_contatos/ui/adicionar/adicionar_page.dart';
 import 'package:projeto_lista_de_contatos/ui/favoritos/favoritos_page.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -17,9 +11,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await ContatoRepository().db;
   await Firebase.initializeApp();
-
-  ContatoFirebase c = ContatoFirebase();
-  c.inserirDados();
 
   runApp(
     MaterialApp(

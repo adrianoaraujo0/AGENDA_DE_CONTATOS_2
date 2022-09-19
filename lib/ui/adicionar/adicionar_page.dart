@@ -34,7 +34,7 @@ class Adicionar extends StatelessWidget {
               // mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 StreamBuilder<bool>(
-                  stream: adicionarController.atualizarFoto.stream,
+                  stream: adicionarController.atualizarFotoPerfil.stream,
                   builder: (context, snapshot) {
                     return GestureDetector(
                       child: Container(
@@ -43,8 +43,10 @@ class Adicionar extends StatelessWidget {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           image: DecorationImage(
-                            image: imagemPefil != null
-                                ? FileImage(File(imagemPefil!))
+                            image: adicionarController
+                                    .imagemController.text.isNotEmpty
+                                ? FileImage(File(
+                                    adicionarController.imagemController.text))
                                 : AssetImage("images/person.png")
                                     as ImageProvider,
                           ),
@@ -58,11 +60,12 @@ class Adicionar extends StatelessWidget {
                             if (file == null) {
                               return;
                             } else {
-                              adicionarController.imagemController.text =
-                                  file.path;
-                              imagemPefil = file.path;
-                              print(adicionarController.imagemController.text);
-                              adicionarController.atualizarFoto.sink.add(true);
+                              adicionarController
+                                  .atualizarFotoAposAdicionarOuRemoverFoto(
+                                      file.path);
+
+                              // adicionarController.atualizarFotoPerfil.sink
+                              //     .add(true);
                             }
                           },
                         );
